@@ -1,0 +1,12 @@
+[submodule "sites/az.com"]
+	path = sites/az.com
+	url = https://github.com/antzucaro/az.com.git
+[submodule "sites/ado-hugo"]
+	path = sites/ado-hugo
+	url = https://github.com/arresteddevops/ado-hugo.git
+[submodule "sites/rdegges"]
+	path = sites/rdegges
+	url = https://github.com/rdegges/rdegges-www.git
+[submodule "sites/kieranhealy"]
+	path = sites/kieranhealy
+	url = https://github.com/kjhealy/kieranhealy.hugo.git
