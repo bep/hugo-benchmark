@@ -52,32 +52,7 @@ func main() {
 	os.Args = os.Args[:1]
 
 	fmt.Println("Start Hugo benchmark ...")
-	pwd, err := os.Getwd()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	sitesPath := filepath.Join(pwd, "sites")
-
-	fis, err := ioutil.ReadDir(sitesPath)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	b := &benchmark{}
-
-	for i, fi := range fis {
-		if fi.IsDir() && !strings.HasPrefix(fi.Name(), ".") {
-			b.sites = append(b.sites, &site{name: fi.Name(), path: filepath.Join(sitesPath, fi.Name())})
-		}
-
-		if i == 0 && firstOnly {
-			break
-		}
-
-	}
+	b := createBench(firstOnly)
 
 	for _, s := range b.sites {
 		for i := 0; i < iterationsPerSite; i++ {
@@ -121,6 +96,47 @@ func main() {
 	fmt.Println(runtime.Version(), helpers.HugoVersion(), total, "-", totalStatus)
 
 	fmt.Println("\n\n")
+}
+
+func createBench(firstOnly bool) *benchmark {
+	pwd, err := os.Getwd()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sitesPath := filepath.Join(pwd, "sites")
+
+	fis, err := ioutil.ReadDir(sitesPath)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	b := &benchmark{}
+
+	for i, fi := range fis {
+		if fi.IsDir() && !strings.HasPrefix(fi.Name(), ".") {
+			b.sites = append(b.sites, &site{name: fi.Name(), path: filepath.Join(sitesPath, fi.Name())})
+		}
+
+		if i == 0 && firstOnly {
+			break
+		}
+
+	}
+
+	return b
+}
+
+func (b *benchmark) build() error {
+	for _, s := range b.sites {
+		s.build()
+		if len(s.errors) > 0 {
+			return fmt.Errorf("Build failed: %q", s.errors)
+		}
+	}
+	return nil
 }
 
 func (s *site) build() {
