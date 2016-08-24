@@ -2,12 +2,14 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/pprof"
 	"strings"
 	"time"
 
@@ -16,7 +18,13 @@ import (
 	jww "github.com/spf13/jwalterweatherman"
 )
 
-var renderToMem = true
+var (
+	renderToMem       = true
+	firstOnly         = false
+	iterationsPerSite = 6
+	cpuProfile        = flag.String("cpuProfile", "", "write cpu profile to file")
+	heapProfile       = flag.String("heapProfile", "", "write heap profile to file")
+)
 
 type benchmark struct {
 	sites []*site
@@ -31,6 +39,18 @@ type site struct {
 }
 
 func main() {
+	flag.Parse()
+	if *cpuProfile != "" {
+		f, err := os.Create(*cpuProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
+	os.Args = os.Args[:1]
+
 	fmt.Println("Start Hugo benchmark ...")
 	pwd, err := os.Getwd()
 
@@ -48,14 +68,19 @@ func main() {
 
 	b := &benchmark{}
 
-	for _, fi := range fis {
+	for i, fi := range fis {
 		if fi.IsDir() && !strings.HasPrefix(fi.Name(), ".") {
 			b.sites = append(b.sites, &site{name: fi.Name(), path: filepath.Join(sitesPath, fi.Name())})
 		}
+
+		if i == 0 && firstOnly {
+			break
+		}
+
 	}
 
 	for _, s := range b.sites {
-		for i := 0; i < 6; i++ {
+		for i := 0; i < iterationsPerSite; i++ {
 			s.build()
 		}
 	}
@@ -75,6 +100,16 @@ func main() {
 			status = fmt.Sprintf("%q", s.errors)
 		}
 		fmt.Printf("%s|%d|%s|%s\n", s.elapsed, s.runs, s.name, status)
+	}
+
+	if *heapProfile != "" {
+		f, err := os.Create(*heapProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		pprof.WriteHeapProfile(f)
+		f.Close()
 	}
 
 	fmt.Println("\n\n")
