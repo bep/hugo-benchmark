@@ -9,8 +9,10 @@ func BenchmarkHugo(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		if err := bench.build(); err != nil {
-			b.Fatal(err)
+		for j := 0; j < 6; j++ {
+			if err := bench.build(); err != nil {
+				b.Fatal(err)
+			}
 		}
 	}
 }

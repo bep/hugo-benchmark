@@ -130,12 +130,15 @@ func createBench(firstOnly bool) *benchmark {
 }
 
 func (b *benchmark) build() error {
+	var elapsed time.Duration
 	for _, s := range b.sites {
 		s.build()
 		if len(s.errors) > 0 {
 			return fmt.Errorf("Build failed: %q", s.errors)
 		}
+		elapsed += s.elapsed
 	}
+	fmt.Println("Sites built in", elapsed)
 	return nil
 }
 
