@@ -16,6 +16,7 @@ import (
 	"github.com/spf13/hugo/commands"
 	"github.com/spf13/hugo/helpers"
 	jww "github.com/spf13/jwalterweatherman"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -159,11 +160,14 @@ func (s *site) incrementElapsed(start time.Time) {
 var logError = errors.New("error(s) in log")
 
 func resetSite() {
-	hugo.
+	commands.MainSite = nil
+	viper.Reset()
 }
+
 func buildHugoSite(path string) error {
 	defer jww.ResetLogCounters()
-	//defer commands.Reset()
+	defer resetSite()
+
 	flags := []string{fmt.Sprintf("--source=%s", path)}
 
 	if renderToMem {
