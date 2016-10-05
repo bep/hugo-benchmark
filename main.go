@@ -158,9 +158,12 @@ func (s *site) incrementElapsed(start time.Time) {
 
 var logError = errors.New("error(s) in log")
 
+func resetSite() {
+	hugo.
+}
 func buildHugoSite(path string) error {
 	defer jww.ResetLogCounters()
-	defer commands.Reset()
+	//defer commands.Reset()
 	flags := []string{fmt.Sprintf("--source=%s", path)}
 
 	if renderToMem {
