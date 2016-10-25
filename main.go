@@ -53,7 +53,6 @@ func main() {
 
 	fmt.Println("Start Hugo benchmark ...")
 	b := createBench(firstOnly)
-
 	for _, s := range b.sites {
 		for i := 0; i < iterationsPerSite; i++ {
 			s.build()
@@ -131,6 +130,7 @@ func createBench(firstOnly bool) *benchmark {
 
 func (b *benchmark) build() error {
 	var elapsed time.Duration
+
 	for _, s := range b.sites {
 		s.build()
 		if len(s.errors) > 0 {
@@ -138,18 +138,17 @@ func (b *benchmark) build() error {
 		}
 		elapsed += s.elapsed
 	}
-	fmt.Println("Sites built in", elapsed)
 	return nil
 }
 
 func (s *site) build() {
+
 	defer s.incrementElapsed(time.Now())
 	s.runs += 1
 	err := buildHugoSite(s.path)
 	if err != nil {
 		s.errors = append(s.errors, err)
 	}
-
 }
 
 func (s *site) incrementElapsed(start time.Time) {
@@ -161,7 +160,7 @@ var logError = errors.New("error(s) in log")
 func buildHugoSite(path string) error {
 	defer jww.ResetLogCounters()
 	defer commands.Reset()
-	flags := []string{fmt.Sprintf("--source=%s", path)}
+	flags := []string{"--quiet", fmt.Sprintf("--source=%s", path)}
 
 	if renderToMem {
 		flags = append(flags, "--renderToMemory")
