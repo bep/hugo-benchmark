@@ -10,3 +10,6 @@
 [submodule "sites/kieranhealy"]
 	path = sites/kieranhealy
 	url = https://github.com/kjhealy/kieranhealy.hugo.git
+[submodule "sites/hugo"]
+	path = sites/hugo
+	url = https://github.com/spf13/hugo.git

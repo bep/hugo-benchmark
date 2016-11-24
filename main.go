@@ -21,7 +21,7 @@ import (
 var (
 	renderToMem       = true
 	firstOnly         = false
-	iterationsPerSite = 6
+	iterationsPerSite = 4
 	cpuProfile        = flag.String("cpuProfile", "", "write cpu profile to file")
 	heapProfile       = flag.String("heapProfile", "", "write heap profile to file")
 )
@@ -116,7 +116,12 @@ func createBench(firstOnly bool) *benchmark {
 
 	for i, fi := range fis {
 		if fi.IsDir() && !strings.HasPrefix(fi.Name(), ".") {
-			b.sites = append(b.sites, &site{name: fi.Name(), path: filepath.Join(sitesPath, fi.Name())})
+			subFolder := ""
+			if strings.HasPrefix(fi.Name(), "hugo") {
+				subFolder = "docs"
+			}
+			p := filepath.Join(sitesPath, fi.Name(), subFolder)
+			b.sites = append(b.sites, &site{name: fi.Name(), path: p})
 		}
 
 		if i == 0 && firstOnly {
