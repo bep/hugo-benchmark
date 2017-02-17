@@ -166,6 +166,7 @@ func buildHugoSite(path string) error {
 	defer jww.ResetLogCounters()
 	defer commands.Reset()
 	flags := []string{"--quiet", fmt.Sprintf("--source=%s", path)}
+	os.Args = []string{os.Args[0]}
 
 	if renderToMem {
 		flags = append(flags, "--renderToMemory")
