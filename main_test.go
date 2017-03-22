@@ -5,6 +5,7 @@ import (
 )
 
 func BenchmarkHugo(b *testing.B) {
+
 	bench := createBench(false)
 
 	b.ResetTimer()

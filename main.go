@@ -10,9 +10,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/pprof"
+	"sort"
 	"strings"
 	"time"
 
+	"github.com/rcrowley/go-metrics"
 	"github.com/spf13/hugo/commands"
 	"github.com/spf13/hugo/helpers"
 	jww "github.com/spf13/jwalterweatherman"
@@ -21,7 +23,7 @@ import (
 var (
 	renderToMem       = true
 	firstOnly         = false
-	iterationsPerSite = 4
+	iterationsPerSite = 1
 	cpuProfile        = flag.String("cpuProfile", "", "write cpu profile to file")
 	heapProfile       = flag.String("heapProfile", "", "write heap profile to file")
 )
@@ -39,6 +41,7 @@ type site struct {
 }
 
 func main() {
+
 	flag.Parse()
 	if *cpuProfile != "" {
 		f, err := os.Create(*cpuProfile)
@@ -95,6 +98,24 @@ func main() {
 	fmt.Println(runtime.Version(), helpers.HugoVersion(), total, "-", totalStatus)
 
 	fmt.Println("\n\n")
+
+	printMetrics()
+}
+
+func printMetrics() {
+	var report []string
+
+	metrics.DefaultRegistry.Each(
+		func(s string, in interface{}) {
+			t := in.(metrics.Timer)
+			report = append(report, fmt.Sprintf("%s: mean: %.2f  max:  %d count:  %d", s, t.Mean(), t.Max(), t.Count()))
+		})
+
+	sort.Strings(report)
+
+	for _, line := range report {
+		fmt.Println(line)
+	}
 }
 
 func createBench(firstOnly bool) *benchmark {
@@ -154,6 +175,8 @@ func (s *site) build() {
 	if err != nil {
 		s.errors = append(s.errors, err)
 	}
+	//fmt.Println("DistinctErrorlog:")
+	//helpers.DistinctErrorLog.Debug()
 }
 
 func (s *site) incrementElapsed(start time.Time) {
