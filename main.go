@@ -95,7 +95,7 @@ func main() {
 		totalStatus = "Failed!"
 	}
 
-	fmt.Println(runtime.Version(), helpers.HugoVersion(), total, "-", totalStatus)
+	fmt.Println(runtime.Version(), helpers.CurrentHugoVersion, total, "-", totalStatus)
 
 	fmt.Println("\n\n")
 
