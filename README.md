@@ -1,6 +1,6 @@
 # hugo-benchmark
 
-Benchark for building a set of random, but real [Hugo](https://github.com/spf13/hugo) sites. 
+Benchmark for building a set of random, but real [Hugo](https://github.com/spf13/hugo) sites. 
 
 ## Install and run
 
